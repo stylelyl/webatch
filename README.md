@@ -2,8 +2,8 @@
 spring batch project for scaling and parallel processing
 
 
-1,This project used mysql database and database configuration in file src/main/resources/batch.properties. Please update as your env.
-  And need to create two business tables:
+1,This project used mysql database and database configuration in file src/main/resources/batch.properties. 
+   Please update as your env and need to create two business tables:
   CREATE TABLE `tm_card_info` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `PRODUCT_NAME` varchar(32) DEFAULT NULL,
