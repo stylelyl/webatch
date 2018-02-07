@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                 http://www.springframework.org/schema/context
+                 http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-4.0.xsd
+                  http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                 http://www.springframework.org/schema/tx 
+                 http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${batch.jdbc.driver}" />
+		<property name="url" value="${batch.jdbc.url}" />
+		<property name="username" value="${batch.jdbc.user}" />
+		<property name="password" value="${batch.jdbc.password}" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" value="classpath*:mybatis-mapping/**/*.xml" />
+		<property name="configLocation"
+			value="classpath:/META-INF/spring/mybatis-config.xml" />
+	</bean>
+
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0">
+			<ref bean="sqlSessionFactory" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="jobLauncher"
+		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean
+		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry" />
+	</bean>
+
+	<bean id="jobRegistry"
+		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+	<bean id="resFile" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg>
+			<value>D:\tmp\addfile.txt</value>
+		</constructor-arg>
+	</bean>
+	<bean id="cmdTask" class="com.test.webatch.example.FileCheckTasklet">
+		<property name="resource" ref="resFile" />
+	</bean>
+
+	<bean id="cmdTaskTmp"
+		class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
+		<property name="command" value="echo hello" /><!-- system command 
+			of OS -->
+		<!-- 5 second timeout for the command to complete -->
+		<property name="timeout" value="5000" />
+	</bean>
+
+	<bean id="cardinfoItemReader" class="com.test.webatch.engine.CardInfoPagingItemReader" scope="step">
+		<property name="parameterValues">
+			<map>
+				<entry key="start" value="#{stepExecutionContext[start]}" />
+				<entry key="end" value="#{stepExecutionContext[end]}" />
+				<entry key="page" value="#{stepExecutionContext[page]}" />
+				<entry key="pageSize" value="#{stepExecutionContext[pageSize]}" />
+			</map>
+		</property>
+	</bean>
+
+    <bean id="cardinfoItemReader_jdbc"  
+        class="org.springframework.batch.item.database.JdbcPagingItemReader"  
+        scope="step">  
+        <property name="dataSource" ref="dataSource" />  
+        <property name="queryProvider">  
+            <bean  
+                class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">  
+                <property name="dataSource" ref="dataSource" />  
+                <property name="selectClause" value="select * " />  
+                <property name="fromClause" value="from tm_card_info" />  
+                <property name="whereClause" value="where id &gt;= :start and id &lt;= :end" />  
+                <property name="sortKey" value="id" />  
+            </bean>  
+        </property>  
+        <!-- Inject via the ExecutionContext in rangePartitioner -->  
+        <property name="parameterValues">  
+            <map>  
+                <entry key="start" value="#{stepExecutionContext[start]}" />  
+                <entry key="end" value="#{stepExecutionContext[end]}" />  
+            </map>  
+        </property>  
+        <property name="pageSize" value="10" />
+        <property name="rowMapper">
+            <bean class="com.test.webatch.data.CardRowMapper" />
+        </property>  
+    </bean>
+
+    <!-- <bean class="org.springframework.batch.core.scope.JobScope" /> -->
+
+    <bean id="cardinfoKeyReader" class="com.test.webatch.engine.CardInfoKeyListReader" scope="step">
+	</bean>
+
+	<bean id="wePartitioner" class="com.test.webatch.engine.WePartitioner" />
+
+	<bean id="cardProcess" class="com.test.webatch.example.CardInfoItemProcessor"></bean>
+	<bean id="nullWriter" class="com.test.webatch.example.NullItemWriter"></bean>
+
+	<bean id="basicDao" class="com.test.webatch.dao.impl.BasicDaoImpl">
+		<property name="mapperLocations" value="classpath*:mybatis-mapping/**/*.xml" />
+	</bean>
+
+	<bean id="tmCardInfoDao" class="com.test.webatch.dao.impl.TmCardInfoDaoImpl">
+	</bean>
+
+	<!-- <tx:annotation-driven mode="aspectj"/> -->
+
+</beans>

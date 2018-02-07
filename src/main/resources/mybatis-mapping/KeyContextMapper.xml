@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.test.webatch.mapping.KeyContextMapper">
+	<resultMap id="BaseResultMap" type="com.test.webatch.domain.KeyContext" >
+		<id column="CONTEXT_ID" property="contextId" jdbcType="INTEGER"/>
+		<result column="KEY_LIST" property="keyList" jdbcType="BLOB" />
+		<result column="SETUP_DATE" property="setupDate" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="KEY_CONTEXT_TABLE_FIELD">CONTEXT_ID,KEY_LIST,SETUP_DATE</sql>
+
+	<sql id="TABLE_SEQUENCE">SEQ_KEY_CONTEXT_CONTEXT_ID.nextval</sql>
+
+	<delete id="deleteByPrimaryKey" parameterType="map" >
+		delete from KEY_CONTEXT
+		where 
+		CONTEXT_ID = #{contextId, jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.test.webatch.domain.KeyContext"  useGeneratedKeys="true" keyProperty="contextId"  keyColumn="CONTEXT_ID">
+		insert into KEY_CONTEXT ( <include refid="KEY_CONTEXT_TABLE_FIELD" /> )
+		values (  #{contextId,jdbcType=INTEGER } , #{keyList,jdbcType=BLOB } , #{setupDate,jdbcType=TIMESTAMP }
+		 <selectKey keyProperty="contextId" resultType="int" order="AFTER">  
+            SELECT LAST_INSERT_ID();  
+        </selectKey>  
+	)
+	</insert>
+	<update id="updateNotNullByPrimaryKey" parameterType="com.test.webatch.domain.KeyContext">
+		update KEY_CONTEXT 
+		<trim prefix="set" suffixOverrides=","> 
+		<if test="keyList != null and keyList != ''  " >
+			KEY_LIST =#{keyList,jdbcType=BLOB },
+		</if>
+		<if test="setupDate != null and setupDate != ''  " >
+			SETUP_DATE =#{setupDate,jdbcType=TIMESTAMP },
+		</if>
+		</trim>
+		where 
+		CONTEXT_ID = #{contextId, jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.test.webatch.domain.KeyContext">
+		update KEY_CONTEXT 
+		<trim prefix="set" suffixOverrides=","> 
+			KEY_LIST =#{keyList,jdbcType=BLOB },		
+			SETUP_DATE =#{setupDate,jdbcType=TIMESTAMP },		
+		</trim>
+		where 
+		CONTEXT_ID = #{contextId, jdbcType=INTEGER}
+	</update>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="map" >
+		select	<include refid="KEY_CONTEXT_TABLE_FIELD" />		
+		from KEY_CONTEXT
+		where 
+		CONTEXT_ID = #{contextId, jdbcType=INTEGER}
+	</select>
+	<select id="selectAll" resultMap="BaseResultMap" parameterType="map" >
+		select <include refid="KEY_CONTEXT_TABLE_FIELD" />		
+ 		from KEY_CONTEXT
+		where 1=1 
+		<if test="contextId != null " >
+			and CONTEXT_ID = #{contextId,jdbcType=INTEGER }
+		</if>
+		<if test="keyList != null and keyList != ''  " >
+			and KEY_LIST = #{keyList,jdbcType=BLOB }
+		</if>
+		<if test="setupDate != null and setupDate != ''  " >
+			and SETUP_DATE = #{setupDate,jdbcType=TIMESTAMP }
+		</if>
+
+		<if test="_SORT_NAME != null and _SORT_NAME != ''  " >
+			<if test="_SORT_ORDER != null and _SORT_ORDER != ''  " >
+				order by ${_SORT_NAME} ${_SORT_ORDER} 
+			</if>
+		</if>
+
+	</select>	
+	<select id="loadKeyList" resultType="int" parameterType="map" >
+		select  ID 		
+ 		from KEY_CONTEXT
+		where 1=1 
+		<if test="contextId != null " >
+			and CONTEXT_ID = #{contextId,jdbcType=INTEGER }
+		</if>
+		<if test="keyList != null and keyList != ''  " >
+			and KEY_LIST = #{keyList,jdbcType=BLOB }
+		</if>
+		<if test="setupDate != null and setupDate != ''  " >
+			and SETUP_DATE = #{setupDate,jdbcType=TIMESTAMP }
+		</if>
+
+		<if test="_SORT_NAME != null and _SORT_NAME != ''  " >
+			<if test="_SORT_ORDER != null and _SORT_ORDER != ''  " >
+				order by ${_SORT_NAME} ${_SORT_ORDER} 
+			</if>
+		</if>
+
+	</select>	
+	<select id="loadKeyStrList" resultType="String" parameterType="map" >
+		select  ID 		
+ 		from KEY_CONTEXT
+		where 1=1 
+		<if test="contextId != null " >
+			and CONTEXT_ID = #{contextId,jdbcType=INTEGER }
+		</if>
+		<if test="keyList != null and keyList != ''  " >
+			and KEY_LIST = #{keyList,jdbcType=BLOB }
+		</if>
+		<if test="setupDate != null and setupDate != ''  " >
+			and SETUP_DATE = #{setupDate,jdbcType=TIMESTAMP }
+		</if>
+
+		<if test="_SORT_NAME != null and _SORT_NAME != ''  " >
+			<if test="_SORT_ORDER != null and _SORT_ORDER != ''  " >
+				order by ${_SORT_NAME} ${_SORT_ORDER} 
+			</if>
+		</if>
+
+	</select>
+</mapper>

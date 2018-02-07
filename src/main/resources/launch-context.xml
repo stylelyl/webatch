@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:property-placeholder location="classpath:batch.properties" />
+
+	<context:component-scan base-package="com.test.webatch" />
+
+	<!-- 第一次运行打开下面的注释,即可自动创建spring-batch相关表 -->
+	<jdbc:initialize-database data-source="dataSource"> <jdbc:script location="${batch.schema_drop.script}" 
+		/> <jdbc:script location="${batch.schema.script}" /> </jdbc:initialize-database> 
+
+	<batch:job-repository id="jobRepository"
+		data-source="dataSource" transaction-manager="transactionManager"
+		isolation-level-for-create="SERIALIZABLE" table-prefix="BATCH_" />
+	<task:executor id="taskExecutor" pool-size="10" />
+
+	<import resource="classpath:/META-INF/spring/job-flow.xml" />
+	<import resource="classpath:/META-INF/spring/spring-bean-context.xml" />
+
+
+</beans>
