@@ -2,7 +2,7 @@
 spring batch project for scaling and parallel processing
 
 
-1,This project used mysql database and database configuration in file src/main/resources/batch.properties. 
+1, This project used mysql database and database configuration in file src/main/resources/batch.properties. 
    Please update as your env and need to create two business tables:
   CREATE TABLE `tm_card_info` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -13,6 +13,7 @@ spring batch project for scaling and parallel processing
   `UPDATE_DATE` date DEFAULT NULL,
   PRIMARY KEY (`ID`)
 );
+
 CREATE TABLE `key_context` (
   `CONTEXT_ID` int(11) NOT NULL AUTO_INCREMENT,
   `KEY_LIST` blob,
@@ -20,7 +21,8 @@ CREATE TABLE `key_context` (
   PRIMARY KEY (`CONTEXT_ID`)
 );
 
-in launch-context.xml, use jdbc:initialize-database to init all tables about spring batch 
+
+In launch-context.xml, use jdbc:initialize-database to init all tables about spring batch 
 <jdbc:initialize-database data-source="dataSource">
    <jdbc:script location="${batch.schema_drop.script}" /> <jdbc:script location="${batch.schema.script}" />
 </jdbc:initialize-database> 
