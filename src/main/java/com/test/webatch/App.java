@@ -21,29 +21,18 @@ import com.test.webatch.domain.TmCardInfo;
 public class App {
 
 	public static void main(String[] args) {
-		System.out.println("start...");
+		System.out.println("...start...");
 		String springConfig = "launch-context.xml";
-		ApplicationContext context = new ClassPathXmlApplicationContext(
-				springConfig);
-		
-		Page<TmCardInfo> page = new Page<TmCardInfo>();
-		page.setPageNumber(5);
-		page.setPageSize(10);
-		TmCardInfoDao tmCardInfoDao = (TmCardInfoDao)context.getBean("tmCardInfoDao");
-		tmCardInfoDao.queryForPage(TmCardInfo.class.getCanonicalName(), null, page);
-		List<TmCardInfo> list = page.getRows();
-		for(TmCardInfo c:list){
-			System.out.println(c);
-		}
-		
+		ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
 		JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
-		Job job = (Job) context.getBean("webatch_job_ex3");
 
-		JobParameters params = new JobParametersBuilder().addDate("batch.date",
-				new Date()).toJobParameters();
+		// you can change jobId to test
+		String jobId = "webatch_job_ex3";
+		Job job = (Job) context.getBean(jobId);
+
+		JobParameters params = new JobParametersBuilder().addDate("batch.date", new Date()).toJobParameters();
 
 		try {
-			if(1==1)
 			jobLauncher.run(job, params);
 		} catch (JobExecutionAlreadyRunningException e) {
 			e.printStackTrace();
@@ -54,8 +43,7 @@ public class App {
 		} catch (JobParametersInvalidException e) {
 			e.printStackTrace();
 		}
-		
-		
-		System.out.println("end...");
+
+		System.out.println("...end...");
 	}
 }
